@@ -1,51 +1,51 @@
 import React from 'react'
-// import './App.css'
 
-function setAttributes(domElement,attributes)
-{
-	for(const [name,value] of Object.entries(attributes))
-	{
-		domElement.setAttribute(name,value)
-	}
-}
+//The below code was made before PlugWrapper. This is a good example to show it's intent: PlugWrapper generalizes this code beyond two.js
+//		function Two(props)
+//		{
+//			const [two, setTwo]  =React.useState(null)
+//			const [elem, setElem]=React.useState(null)//The dom element we're rendering to
+//			if(elem && !two)
+//			{
+//				let params={/*width: 29958, height: 200*/}
+//				let newTwo=new window.Two(params)
+//				setTwo(newTwo)
+//				console.log(elem)
+//				newTwo.appendTo(elem)
+//			}
+//			if(two)
+//			{
+//				let circle=two.makeCircle(72, 100, 50)
+//				let rect  =two.makeRectangle(213, 100, 100, 100)
+//
+//				// The object returned has many stylable properties:
+//				circle.fill     ='#FF8000'
+//				circle.stroke   ='orangered' // Accepts all valid css color
+//				circle.linewidth=props.width
+//
+//				rect.fill   ='rgb(0, 200, 255)'
+//				rect.opacity=0.75
+//				rect.noStroke()
+//
+//				// Don't forget to tell two to render everything
+//				// to the screen
+//				two.update()
+//			}
+//			return <div ref={setElem} {...props}/>
+//		}
 
-// function Two(props)
-// {
-// 	const [two ,setTwo ]=React.useState(null)
-// 	const [elem,setElem]=React.useState(null)//The dom element we're rendering to
-// 	if(elem&&!two)
-// 	{
-// 		let params={/*width: 29958, height: 200*/}
-// 		let newTwo=new window.Two(params)
-// 		setTwo(newTwo)
-// 		console.log(elem)
-// 		newTwo.appendTo(elem)
-// 	}
-// 	if(two)
-// 	{
-// 		let circle=two.makeCircle(72, 100, 50)
-// 		let rect  =two.makeRectangle(213, 100, 100, 100)
-//
-// 		// The object returned has many stylable properties:
-// 		circle.fill     ='#FF8000'
-// 		circle.stroke   ='orangered' // Accepts all valid css color
-// 		circle.linewidth=props.width
-//
-// 		rect.fill   ='rgb(0, 200, 255)'
-// 		rect.opacity=0.75
-// 		rect.noStroke()
-//
-// 		// Don't forget to tell two to render everything
-// 		// to the screen
-// 		two.update()
-// 	}
-// 	return <div ref={setElem} {...props}/>
-//
-// }
-function Generalized({newPlug,updatePlug})
+
+function PlugWrapper({newPlug,updatePlug})
 {
 	//TODO update the documentation on this function. Some variable names/meanings have changed.
+	//TODO There's gotta be some better name than "plug". When you think a really good descriptive name, change it.
+	//Motivation:
+	//	I don't want to use third-party bindings for libraries made by other people, such as react bindings for Three.js.
+	//	I want to use three.js like it was originally meant to be, but also with react.
+	//	Each time we create a react component, we want to create a new instance of some plug (I.E. keep separate
+	//	We also wish to be able to mutate this plug through props, though not exclusively (we also want a plug like Three.js to be able to modify itself)
 	//Summary:
+	//	I define a 'plug' to be some non-react component that we wish to integrate into react, such as Three.js or jquery etc.
 	//	This function is a React component meant to hold objects that are not natively compatible with react.
 	//	Examples include instances of THREE.js scenes, which have their own state and render to a webgl canvas.
 	//	This wrapper is meant to let you easily integrate non-react code in a react-like way. Please see examples.
@@ -54,15 +54,15 @@ function Generalized({newPlug,updatePlug})
 	//	- updatePlug is a function that takes one argument: the plug instance, and returns nothing.
 	//	- elemProps is optional, and sets the properties of elem (aka the div holding the plug)
 	//How it works:
-	//	First, the ref calls setElem. This results in Generalized being called again, now with elem!==null.
+	//	First, the ref calls setElem. This results in PlugWrapper being called again, now with elem!==null.
 	//	Then, elem
 	//Notes:
-	//	- If you want to have interactivity through React props such as onClick, wrap Generalized in a div. It's crucially important that this component's div doesn't update, because setElem should only ever be called once (which is called from the ref property on the div this component returns).
-	//	- All non-react state data should be stored in your plug somehow. I made two.mydata={} and stored all my variables in there, so they weren't wiped each time we call Generalized.
+	//	- If you want to have interactivity through React props such as onClick, wrap PlugWrapper in a div. It's crucially important that this component's div doesn't update, because setElem should only ever be called once (which is called from the ref property on the div this component returns).
+	//	- All non-react state data should be stored in your plug somehow. I made two.mydata={} and stored all my variables in there, so they weren't wiped each time we call PlugWrapper.
 	//		- Tip: For concision, I used Object.assign(two.mydata={},{circle,rect,group})
 	//	- Make sure that you put anything that should be created only once in newPlug, instead of updatePlug. newPlug is kind of like a constructor, and is only called once, whereas updatePlug is called over and over again.
-	const [plug,setPlug]=React.useState(null)//Some plugin or something like two.js
-	const [elem,setElem]=React.useState(null)//The dom element we're rendering to
+	const [plug,setPlug]=React.useState(null)//Some plugin or something like two.js, that we will put inside a div called 'elem' (short for "element")
+	const [elem,setElem]=React.useState(null)//The dom element (a div, to be more specific) that we're putting the plug inside
 	if(plug)
 	{
 		updatePlug(plug)
@@ -75,6 +75,7 @@ function Generalized({newPlug,updatePlug})
 	}
 	return	<div ref={setElem}/>
 }
+
 function GeneralizedTwo(props)
 {
 	function newPlug()
@@ -110,7 +111,7 @@ function GeneralizedTwo(props)
 		circle.linewidth=props.width
 	}
 	return <div {...props}>
-		<Generalized {...{newPlug, updatePlug}}/>
+		<PlugWrapper {...{newPlug, updatePlug}}/>
 	</div>
 }
 function App()
