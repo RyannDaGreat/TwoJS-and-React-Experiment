@@ -712,4 +712,46 @@ const r={
 		return text.match(/^[A-Za-z0-9_]+$/)!==null
 	},
 
+	PlugWrapper({newPlug,updatePlug})
+	{
+		//TODO update the documentation on this function. Some variable names/meanings have changed.
+		//TODO There's gotta be some better name than "plug". When you think a really good descriptive name, change it.
+		//Motivation:
+		//	I define a 'plug' to be some non-react component that we wish to integrate into react, such as Three.js or jquery etc.
+		//	I don't want to use third-party bindings for libraries made by other people, such as react bindings for Three.js.
+		//	I want to use three.js like it was originally meant to be, but also with react.
+		//	Each time we create a react component, we want to create a new instance of some plug (I.E. keep separate
+		//	We also wish to be able to mutate this plug through props, though not exclusively (we also want a plug like Three.js to be able to modify itself)
+		//Summary:
+		//	This function is a React component meant to hold objects that are not natively compatible with react.
+		//	Examples include instances of THREE.js scenes, which have their own state and render to a webgl canvas.
+		//	This wrapper is meant to let you easily integrate non-react code in a react-like way. Please see examples.
+		//Parameters:
+		//	- newPlug is a function that takes no arguments that returns a new instance of the plug.
+		//	- updatePlug is a function that takes one argument: the plug instance, and returns nothing.
+		//How it works:
+		//	Read this function's code from the bottom-up; as this is the true order of when events occur.
+		//	First, the ref calls setElem. This results in PlugWrapper being called again, now with elem!==null.
+		//	Then, elem
+		//Notes:
+		//	- If you want to have interactivity through React props such as onClick, wrap PlugWrapper in a div. It's crucially important that this component's div doesn't update, because setElem should only ever be called once (which is called from the ref property on the div this component returns).
+		//	- All non-react state data should be stored in your plug somehow. I made two.mydata={} and stored all my variables in there, so they weren't wiped each time we call PlugWrapper.
+		//		- Tip: For concision, I used Object.assign(two.mydata={},{circle,rect,group})
+		//	- Make sure that you put anything that should be created only once in newPlug, instead of updatePlug. newPlug is kind of like a constructor, and is only called once, whereas updatePlug is called over and over again.
+		const [plug,setPlug]=React.useState(null)//Some plugin or something like two.js, that we will put inside a div called 'elem' (short for "element")
+		const [elem,setElem]=React.useState(null)//The dom element (a div, to be more specific) that we're putting the plug inside
+		if(plug)
+		{
+			updatePlug(plug)
+		}
+		else if(elem)
+		{
+			const _=newPlug()
+			setPlug(_)
+			_.appendTo(elem)//This should only ever happen once, unless PlugWrapper is written incorrectly
+		}
+		return	<div ref={setElem}/>
+	}
 }
+window.r=r
+export default r
