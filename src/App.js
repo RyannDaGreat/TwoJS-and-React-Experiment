@@ -40,20 +40,20 @@ function PlugWrapper({newPlug,updatePlug})
 	//TODO update the documentation on this function. Some variable names/meanings have changed.
 	//TODO There's gotta be some better name than "plug". When you think a really good descriptive name, change it.
 	//Motivation:
+	//	I define a 'plug' to be some non-react component that we wish to integrate into react, such as Three.js or jquery etc.
 	//	I don't want to use third-party bindings for libraries made by other people, such as react bindings for Three.js.
 	//	I want to use three.js like it was originally meant to be, but also with react.
 	//	Each time we create a react component, we want to create a new instance of some plug (I.E. keep separate
 	//	We also wish to be able to mutate this plug through props, though not exclusively (we also want a plug like Three.js to be able to modify itself)
 	//Summary:
-	//	I define a 'plug' to be some non-react component that we wish to integrate into react, such as Three.js or jquery etc.
 	//	This function is a React component meant to hold objects that are not natively compatible with react.
 	//	Examples include instances of THREE.js scenes, which have their own state and render to a webgl canvas.
 	//	This wrapper is meant to let you easily integrate non-react code in a react-like way. Please see examples.
 	//Parameters:
 	//	- newPlug is a function that takes no arguments that returns a new instance of the plug.
 	//	- updatePlug is a function that takes one argument: the plug instance, and returns nothing.
-	//	- elemProps is optional, and sets the properties of elem (aka the div holding the plug)
 	//How it works:
+	//	Read this function's code from the bottom-up; as this is the true order of when events occur.
 	//	First, the ref calls setElem. This results in PlugWrapper being called again, now with elem!==null.
 	//	Then, elem
 	//Notes:
@@ -71,7 +71,7 @@ function PlugWrapper({newPlug,updatePlug})
 	{
 		const _=newPlug()
 		setPlug(_)
-		_.appendTo(elem)//This should only ever happen once
+		_.appendTo(elem)//This should only ever happen once, unless PlugWrapper is written incorrectly
 	}
 	return	<div ref={setElem}/>
 }
