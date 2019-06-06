@@ -114,6 +114,9 @@ function GeneralizedTwo(props)
 		<PlugWrapper {...{newPlug, updatePlug}}/>
 	</div>
 }
+
+function PropBlend
+
 function App()
 {
 	const [w,sw]=React.useState(4)
