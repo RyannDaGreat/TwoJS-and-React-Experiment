@@ -122,6 +122,11 @@ function PropsBlend({alpha,props,target,Component,children})
 	//           props    ={}
 	//           target   ={{prop1:4,prop5:7}}
 	//           component={Div}/>
+	//
+	//<PropsBlend Component={GeneralizedTwo}
+	//			alpha    ={w}
+	//			target   ={{width: 10}}
+	//			props    ={{width: 0, onMouseMove: ()=>sw(w+.1)}}/>
 	let objectBlend=r.objectBlend(props, target, alpha)
 	window._props=props
 	window._target=target
@@ -143,11 +148,11 @@ function App()
 	const [w,sw]=React.useState(0)
 	return <>
 		<GeneralizedTwo width={w}
-						onMouseMove={()=>sw(w+.1)} />
+		                onMouseMove={()=>sw(w+.1)} />
 		<PropsBlend Component={GeneralizedTwo}
-					alpha    ={w}
-					target   ={{width: 10}}
-					props    ={{width: 0, onMouseMove: ()=>sw(w+.1)}}/>
+		            alpha    ={w}
+		            target   ={{width: 10}}
+		            props    ={{width: 0, onMouseMove: ()=>sw(w+.1)}}/>
 	</>
 }
 

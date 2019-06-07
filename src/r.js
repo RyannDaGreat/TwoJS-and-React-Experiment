@@ -304,6 +304,14 @@ const r={
 		console.assert(arguments.length===1,'Wrong number of arguments.')
 		return r.isPurePrototypeOf(x, Number)
 	},
+	isNumber(x)
+	{
+		return typeof x==='number'
+	},
+	isString(x)
+	{
+		return typeof x==='string'
+	},
 	are_objects(...variables)
 	{
 		for(const variable of variables)
@@ -722,7 +730,7 @@ const r={
 		// r.valueBlend(3  ,1  ,1 )	--->	1
 		// r.valueBlend(3  ,1  ,.5)	--->	2
 		// r.valueBlend(3  ,'A',.5)	--->	"A"
-		if(r.isPureNumber(a)&&r.isPureNumber(b))
+		if(r.isNumber(a)&&r.isNumber(b))
 			return blend(a,b,alpha)
 		return alpha<threshold?a:b
 	},
