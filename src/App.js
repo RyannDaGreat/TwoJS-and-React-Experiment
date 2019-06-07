@@ -139,18 +139,30 @@ function PropsBlend({alpha,props,target,Component,children})
 
 function PropsLegato({alphaRate,targetProps,Component,children})
 {
-	//Exponential smoothing on all targetProps whose name is in 'keys'
-	//Will only tween numerical properties
+	//Parameters:
+	//	alphaRate determines the blend rate (per second) towards targetProps' numerical values. Any non-numerical values are immediately set.
+	//	children is a parameter passed implicitly as a result of the way React works (it's the body between the PropsLegato tags)
+	//Summary:
+	//	PropsLegato is a React component that renders Component with targetProps and the same children given to PropsLegato.
+	//	It temporally smoothes any numeric values in targetProps, at a speed determined by alphaRate.
+	//	Will only tween numerical properties. All other properties are set immediately.
+	//	PropsLegato is called PropsLegato, because in the context of musical synths, exponential smoothing of pitch values is known as Legato. I like the word.
+	//	The higher alphaRate is, the faster targetProps will change. alphaRate is a numeric value between 0 and 1 (inclusive)
+	//	If alphaRate is 0 , numeric values in Component's props will never change.
+	//	If alphaRate is .5, numeric values in Component's props will be set half-way to targetProps' numeric values in one second.
+	//	If alphaRate is 1 , numeric values in Component's props will be set to targetProps' numeric values immediately.
+	const [prevTime     ,setPrevTime     ]=React.useState(r.gtoc())
+	const [prevProps    ,setPrevProps    ]=React.useState(null    )//We set this to null so that TODO why?
+	const [prevConverged,setPrevConverged]=React.useState(false   )
 	console.assert(r.isNumber(alphaRate)&&alphaRate>=0&&alphaRate<=1,'Bad alphaRate value:',alphaRate)
-	const [prevTime ,setPrevTime ]=React.useState(r.gtoc())
-	const [prevProps,setPrevProps]=React.useState(null)
-	const [converged,setConverged]=React.useState(false)
+	console.assert(r.haveSameKeys(prevProps,targetProps),'Please don\'t add or remove props, as this can cause buggy behaviour. targetProps=',targetProps,'prevProps=',prevProps)
 	const currentTime=r.gtoc()//Time is measured in seconds
-	console.assert(prevTime<=currentTime)
-	const deltaTime=currentTime-prevTime
+	console.assert(prevTime<=currentTime,'Time never moves backwards. This is an assertion to the internal logic of PropsLegato. If this fails, PropsLegato is broken.')
+	const deltaTime=currentTime-prevTime//deltaTime is necessarily >= 0 because of the previous assertion
 	const alpha=1-Math.pow(1-alphaRate,deltaTime)// https://www.desmos.com/calculator/wxlvrbsvjw
 	const currentProps=r.objectBlend(prevProps,targetProps,alpha)
 	React.useEffect(()=>{
+		//We set props inside useEffect, because React throws a hissy-fit if we do it in the main function
 		//TODO currently this component wastes a heck-ton of CPU because it never reaches convergence because it doesn't have a good way (yet) of not gettning large deltaTime valus after doing someting some time after converging
 		const converged=r.equalsShallow(prevProps,currentProps)//If this is true, stop animating to save CPU (blending will have no effect anymore)
 		if(!converged)
@@ -159,7 +171,7 @@ function PropsLegato({alphaRate,targetProps,Component,children})
 			setPrevProps(currentProps)
 			setPrevTime (currentTime )
 		}
-	})
+	},[prevProps])
 	return <Component {...currentProps}>
 		{children}
 	</Component>
