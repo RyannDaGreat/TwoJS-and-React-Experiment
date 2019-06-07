@@ -689,22 +689,21 @@ const r={
 	},
 	reflexiveDict(array)
 	{
+		//TODO needs better name
 		// reflexiveDict(['A',1,[]])   --->   {'A':'A','1':1,'[]':[]}
 		const out={}
 		for(const item of array)
 			out[item]=item
 		return out
 	},
-
-
 	boundingBoxOfThreeObject(threeObject)
 	{
+		//TODO possibly keep in my npm repo, but remove from specifically r.js and put in a Three.js-specific file (though can still be accessed from the r object, somehow...)
 		//Meant for use with a threeJs object
 		// noinspection JSUnresolvedVariable,JSUnresolvedFunction
 		return new window.THREE.Box3().setFromObject(threeObject)
 		//returns something in the form {min:{x,y,z},max:{x,y,z}}, where x,y,z are numbers
 	},
-
 	randomCharacters(length,{characters='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'}={})
 	{
 		//From https://stackoverflow.com/questions/1349404/generate-random-string-characters-in-javascript
