@@ -151,6 +151,7 @@ function PropsLegato({alphaRate,targetProps,Component,children})
 	const currentProps=r.objectBlend(prevProps,targetProps,alpha)
 	// console.log(currentProps)
 	React.useEffect(()=>{
+		//TODO currently this component wastes a heck-ton of CPU because it never reaches convergence because it doesn't have a good way (yet) of not gettning large deltaTime valus after doing someting some time after converging
 		// const converged=r.equalsShallow(prevProps,currentProps)//If this is true, stop animating to save CPU (blending will have no effect anymore)
 		// if(!converged)
 		{
