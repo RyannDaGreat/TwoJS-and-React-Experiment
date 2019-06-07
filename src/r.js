@@ -34,12 +34,12 @@ const r={
 	refreshPage()
 	{
 		console.assert(arguments.length===0,'Wrong number of arguments.')
-		location.reload();
+		window.location.reload();
 	},
 	goToUrl(url)
 	{
 		console.assert(arguments.length===1,'Wrong number of arguments.')
-		location.assign(url)
+		window.location.assign(url)
 	},
 	async doFetch(url,body=undefined)
 	{
@@ -247,7 +247,7 @@ const r={
 		//EXAMPLE: nested_path([],)
 		console.assert(path&&Object.getPrototypeOf(path)===Array.prototype,'Path must be a list of keys')
 		let out=value
-		for(key of [...path].reverse())
+		for(const key of [...path].reverse())
 			out={[key]:out}
 		return out
 	},
@@ -678,7 +678,7 @@ const r={
 	{
 		//Meant for use with a threeJs object
 		// noinspection JSUnresolvedVariable,JSUnresolvedFunction
-		return new THREE.Box3().setFromObject(threeObject)
+		return new window.THREE.Box3().setFromObject(threeObject)
 		//returns something in the form {min:{x,y,z},max:{x,y,z}}, where x,y,z are numbers
 	},
 
