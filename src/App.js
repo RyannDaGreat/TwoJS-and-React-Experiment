@@ -35,7 +35,7 @@ import r from './r.js'
 //		}
 
 
-function PlugWrapper({newPlug,updatePlug})
+function PlugWrapper({newPlug,updatePlug=plug=>{}})
 {
 	//TODO update the documentation on this function. Some variable names/meanings have changed.
 	//TODO There's gotta be some better name than "plug". When you think a really good descriptive name, change it.
@@ -51,7 +51,7 @@ function PlugWrapper({newPlug,updatePlug})
 	//	This wrapper is meant to let you easily integrate non-react code in a react-like way. Please see examples.
 	//Parameters:
 	//	- newPlug is a function that takes no arguments that returns a new instance of the plug.
-	//	- updatePlug is a function that takes one argument: the plug instance, and returns nothing.
+	//	- updatePlug is a function that takes one argument: the plug instance, and returns nothing. It's optional.
 	//How it works:
 	//	Read this function's code from the bottom-up; as this is the true order of when events occur.
 	//	First, the ref calls setElem. This results in PlugWrapper being called again, now with elem!==null.
@@ -144,16 +144,16 @@ function PropsLegato({alphaRate,targetProps,Component,children})
 	console.assert(r.isNumber(alphaRate)&&alphaRate>=0&&alphaRate<=1,'Bad alphaRate value:',alphaRate)
 	const [prevTime ,setPrevTime ]=React.useState(r.gtoc())
 	const [prevProps,setPrevProps]=React.useState({})
+	const [converged,setConverged]=React.useState(false)
 	const currentTime=r.gtoc()//Time is measured in seconds
 	console.assert(prevTime<=currentTime)
 	const deltaTime=currentTime-prevTime
 	const alpha=1-Math.pow(1-alphaRate,deltaTime)// https://www.desmos.com/calculator/wxlvrbsvjw
 	const currentProps=r.objectBlend(prevProps,targetProps,alpha)
-	// console.log(currentProps)
 	React.useEffect(()=>{
 		//TODO currently this component wastes a heck-ton of CPU because it never reaches convergence because it doesn't have a good way (yet) of not gettning large deltaTime valus after doing someting some time after converging
-		// const converged=r.equalsShallow(prevProps,currentProps)//If this is true, stop animating to save CPU (blending will have no effect anymore)
-		// if(!converged)
+		const converged=r.equalsShallow(prevProps,currentProps)//If this is true, stop animating to save CPU (blending will have no effect anymore)
+		if(!converged)
 		{
 			//The !converged check is necessary, otherwise this will loop infinitely (because we're setting the state, which will cause PropsLegato to render again and set the state again etc)
 			setPrevProps(currentProps)

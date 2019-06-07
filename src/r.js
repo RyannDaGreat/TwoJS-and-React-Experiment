@@ -279,6 +279,13 @@ const r={
 		console.assert(arguments.length===1,'Wrong number of arguments.')
 		return r.isPurePrototypeOf(x, Object)
 	},
+	isObject(x)
+	{
+		//Returns true IFF x is a pure object, meaning it could have been created with an object literal (no funky prototype chains)
+		//For example, r.isPureObject(any delta) is always true (because all deltas should be able to exist from object literals)
+		console.assert(arguments.length===1,'Wrong number of arguments.')
+		return x instanceof Object
+	},
 	isPureFunction(x)
 	{
 		console.assert(arguments.length===1,'Wrong number of arguments.')
@@ -294,10 +301,19 @@ const r={
 		console.assert(arguments.length===1,'Wrong number of arguments.')
 		return r.isPurePrototypeOf(x, Array)
 	},
+	isArray(x)
+	{
+		console.assert(arguments.length===1,'Wrong number of arguments.')
+		return x instanceof Array
+	},
 	isPureString(x)
 	{
 		console.assert(arguments.length===1,'Wrong number of arguments.')
 		return r.isPurePrototypeOf(x, String)
+	},
+	isString(x)
+	{
+		return typeof x==='string'
 	},
 	isPureNumber(x)
 	{
@@ -308,24 +324,20 @@ const r={
 	{
 		return typeof x==='number'
 	},
-	isString(x)
-	{
-		return typeof x==='string'
-	},
-	are_objects(...variables)
+	arePureObjects(...variables)
 	{
 		for(const variable of variables)
 			if(!r.isPureObject(variable))
 				return false
 		return true
 	},
-	numbered_lines_string(string,numberToPrefix=i=>i+'\t')
+	numberedLinesString(string, numberToPrefix=i=>i+'\t')
 	{
 		console.assert(arguments.length>=1,'Wrong number of arguments.')
 		//This function is meant for printing out code, with line-numbers on the far left.
 		//EXAMPLE:
 		//	CODE:
-		//		console.log(numbered_lines_string('line one\nline two\nline three'))
+		//		console.log(numberedLinesString('line one\nline two\nline three'))
 		//	OUTPUT:
 		//		1	line one
 		//		2	line two
@@ -703,7 +715,6 @@ const r={
 		}
 		return result;
 	},
-
 	isNamespaceable(text)
 	{
 		//Boolean function
@@ -750,6 +761,40 @@ const r={
 		for(const key of Object.keys(b))
 			out[key]=blend(out[key],b[key],alpha)
 		return out
+	},
+	haveSameKeys(a,b)
+	{
+		//Summary:
+		//	Boolean function that returns true if and only if a has the same keys as b
+		//	There are no restrictions on the values of a and b.
+		//	This function should run very quickly
+		//Properties:
+		//	This function has an equality relation:
+		//	haveSameKeys(a,b)                        --->   true                //Reflexivity
+		//	haveSameKeys(a,b)                        --->   haveSameKeys(b,a)   //Symmetry
+		//	haveSameKeys(a,b) && haveSameKeys(b,c)   --->   haveSameKeys(a,c)   //Transitivity
+		//Examples:
+		//	haveSameKeys({a:4},{a:6})         --->   true
+		//	haveSameKeys({a:4},{a:{b:4}})     --->   true
+		//	haveSameKeys({a:4},{a:1,b:5})     --->   false
+		//	haveSameKeys({b:8,a:4},{a:1,b:5}) --->   true
+		//	haveSameKeys(3,"")                --->   true   //Because both have Object.keys(3)====Object.keys("")====[]
+		//	haveSameKeys(3,{})                --->   true
+		//	haveSameKeys(3,{a:5})             --->   false
+		//	haveSameKeys(null,{a:5})          --->   false
+		//	haveSameKeys(null,4)              --->   true   //Object.keys(null) throws an error, but this function treats null and undefined as having no keys, and pretends Object.keys(null)====Object.keys(undefined)====[]
+		//	haveSameKeys(null,{})             --->   true
+		//	haveSameKeys(undefined,{})        --->   true
+		//	haveSameKeys(undefined,null)      --->   true
+		//	haveSameKeys({3:5},null)          --->   false
+		const aKeys=a===undefined||a===null?[]:Object.keys(a)
+		const bKeys=b===undefined||b===null?[]:Object.keys(b)
+		//We can assume that all values in these lists are unique, pure strings
+		if(aKeys.length!==bKeys.length)return false
+		for(const aKey of aKeys)
+			if(!(aKey in b))
+				return false
+		return true
 	},
 }
 window.r=r
