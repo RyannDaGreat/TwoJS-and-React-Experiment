@@ -1,5 +1,5 @@
 import React from 'react'
-
+import r from 'r.js'
 //The below code was made before PlugWrapper. This is a good example to show it's intent: PlugWrapper generalizes this code beyond two.js
 //		function Two(props)
 //		{
@@ -115,7 +115,23 @@ function GeneralizedTwo(props)
 	</div>
 }
 
-function PropBlend
+function PropBlend({alpha,props,target,component})
+{
+	//<PropBlend alpha    ={.5}
+	//           props    ={}
+	//           target   ={{prop1:4,prop5:7}}
+	//           component={Div}/>
+	function isBlendable(value)
+	{
+		return typeof value==='number'
+	}
+
+	const x={...props,...target}
+	const y={...props,...target}
+	const keys=[]
+
+	r.blend()
+}
 
 function App()
 {

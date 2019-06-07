@@ -711,47 +711,34 @@ const r={
 		// isNamespaceable("2df_92_3")	--->	true
 		return text.match(/^[A-Za-z0-9_]+$/)!==null
 	},
-
-	PlugWrapper({newPlug,updatePlug})
+	valueBlend(a,b,alpha,{threshold=0,blend=r.blend}={})
 	{
-		//TODO update the documentation on this function. Some variable names/meanings have changed.
-		//TODO There's gotta be some better name than "plug". When you think a really good descriptive name, change it.
-		//Motivation:
-		//	I define a 'plug' to be some non-react component that we wish to integrate into react, such as Three.js or jquery etc.
-		//	I don't want to use third-party bindings for libraries made by other people, such as react bindings for Three.js.
-		//	I want to use three.js like it was originally meant to be, but also with react.
-		//	Each time we create a react component, we want to create a new instance of some plug (I.E. keep separate
-		//	We also wish to be able to mutate this plug through props, though not exclusively (we also want a plug like Three.js to be able to modify itself)
-		//Summary:
-		//	This function is a React component meant to hold objects that are not natively compatible with react.
-		//	Examples include instances of THREE.js scenes, which have their own state and render to a webgl canvas.
-		//	This wrapper is meant to let you easily integrate non-react code in a react-like way. Please see examples.
-		//Parameters:
-		//	- newPlug is a function that takes no arguments that returns a new instance of the plug.
-		//	- updatePlug is a function that takes one argument: the plug instance, and returns nothing.
-		//How it works:
-		//	Read this function's code from the bottom-up; as this is the true order of when events occur.
-		//	First, the ref calls setElem. This results in PlugWrapper being called again, now with elem!==null.
-		//	Then, elem
-		//Notes:
-		//	- If you want to have interactivity through React props such as onClick, wrap PlugWrapper in a div. It's crucially important that this component's div doesn't update, because setElem should only ever be called once (which is called from the ref property on the div this component returns).
-		//	- All non-react state data should be stored in your plug somehow. I made two.mydata={} and stored all my variables in there, so they weren't wiped each time we call PlugWrapper.
-		//		- Tip: For concision, I used Object.assign(two.mydata={},{circle,rect,group})
-		//	- Make sure that you put anything that should be created only once in newPlug, instead of updatePlug. newPlug is kind of like a constructor, and is only called once, whereas updatePlug is called over and over again.
-		const [plug,setPlug]=React.useState(null)//Some plugin or something like two.js, that we will put inside a div called 'elem' (short for "element")
-		const [elem,setElem]=React.useState(null)//The dom element (a div, to be more specific) that we're putting the plug inside
-		if(plug)
-		{
-			updatePlug(plug)
-		}
-		else if(elem)
-		{
-			const _=newPlug()
-			setPlug(_)
-			_.appendTo(elem)//This should only ever happen once, unless PlugWrapper is written incorrectly
-		}
-		return	<div ref={setElem}/>
-	}
+		//Simple blend between two values. Does not blend individual elements.
+		//Only numbers can be tweened
+		// r.valueBlend('A',1  ,.4)	--->	1
+		// r.valueBlend('A',1  ,.0)	--->	1
+		// r.valueBlend('A',1  ,0 )	--->	1
+		// r.valueBlend(3  ,1  ,0 )	--->	3
+		// r.valueBlend(3  ,1  ,1 )	--->	1
+		// r.valueBlend(3  ,1  ,.5)	--->	2
+		// r.valueBlend(3  ,'A',.5)	--->	"A"
+		if(r.is_number(a)&&r.is_number(b))
+			return blend(a,b,alpha)
+		return alpha<threshold?a:b
+	},
+	objectBlend(a,b,alpha,{blend=r.valueBlend}={})
+	{
+		//Kind of like deltas.blended, except it's shallow. It isn't recursive.
+		//This is a pure function.
+		// r.objectBlend({a:5,b:6,c:8}    ,{t:5,c:7      },.9)    --->    {t: 5, c: 7.1    , a: 5, b: 6  }
+		// r.objectBlend({a:5,b:6,c:8}    ,{b:5,c:'a'    },.9)    --->    {t: 5, c: "a"    , a: 5, b: 5.1}
+		// r.objectBlend({a:5,b:6,c:8}    ,{b:5,c:{d:'a'}},.9)    --->    {t: 5, c: {d:'a'}, a: 5, b: 5.1}
+		// r.objectBlend({a:5,b:6,c:{d:2}},{t:5,c:{d:3  }},.2)    --->    {t: 5, c: {d:3  }, a: 5, b: 6  }
+		const out={...b,...a}
+		for(const key of Object.keys(b))
+			out[key]=blend(out[key],b[key],alpha)
+		return out
+	},
 }
 window.r=r
 export default r
