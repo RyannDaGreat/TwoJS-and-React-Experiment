@@ -387,7 +387,10 @@ const r={
 	},
 	gtoc()
 	{
-		//Return _remainintTime in seconds since 1970
+		//toc, like toc in MATLAB
+		//gtoc stands for 'global toc'
+		//
+		//Return remaining time in seconds since 1970
 		console.assert(arguments.length===0,'Wrong number of arguments.')
 		return new Date().getTime()/1000
 	},

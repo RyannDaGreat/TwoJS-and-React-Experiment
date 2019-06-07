@@ -127,6 +127,7 @@ function PropsBlend({alpha,props,target,Component,children})
 	//			alpha    ={w}
 	//			target   ={{width: 10}}
 	//			props    ={{width: 0, onMouseMove: ()=>sw(w+.1)}}/>
+	//
 	let objectBlend=r.objectBlend(props, target, alpha)
 	window._props=props
 	window._target=target
@@ -136,11 +137,10 @@ function PropsBlend({alpha,props,target,Component,children})
 	</Component>
 }
 
-function PropsBlendEasy(props)
+function PropsLegato({alphaPerSecond,props,keys,Component,children})
 {
-	//This is 'Easy' because it allows for easier refactoring from things that dont use PropBlend, but could have name collisions with alpha,target, and/or Component.
-	const {alpha,target,Component,children}=props
-	return <PropsBlend {...{...props,props}}/>
+	//Exponential smoothing on all props whose name is in 'keys'
+
 }
 
 function App()
