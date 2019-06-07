@@ -763,6 +763,7 @@ const r={
 	},
 	haveSameKeys(a,b)
 	{
+		//TODO: Conceptual question, should haveSameKeys(null,{a:4}) return true because we don't know what keys null is supposed to have? Or do we return false, because null has no keys (this is what it currently does)...
 		//Summary:
 		//	Boolean function that returns true if and only if a has the same keys as b
 		//	There are no restrictions on the values of a and b.

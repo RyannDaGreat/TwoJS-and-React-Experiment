@@ -143,7 +143,7 @@ function PropsLegato({alphaRate,targetProps,Component,children})
 	//Will only tween numerical properties
 	console.assert(r.isNumber(alphaRate)&&alphaRate>=0&&alphaRate<=1,'Bad alphaRate value:',alphaRate)
 	const [prevTime ,setPrevTime ]=React.useState(r.gtoc())
-	const [prevProps,setPrevProps]=React.useState({})
+	const [prevProps,setPrevProps]=React.useState(null)
 	const [converged,setConverged]=React.useState(false)
 	const currentTime=r.gtoc()//Time is measured in seconds
 	console.assert(prevTime<=currentTime)
