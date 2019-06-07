@@ -773,15 +773,16 @@ const r={
 		//	haveSameKeys(a,b)                        --->   haveSameKeys(b,a)   //Symmetry
 		//	haveSameKeys(a,b) && haveSameKeys(b,c)   --->   haveSameKeys(a,c)   //Transitivity
 		//Examples:
+		//	NOTE: Examples that have -*-> are meant to highlight some edge cases worth checking out
 		//	haveSameKeys({a:4},{a:6})         --->   true
 		//	haveSameKeys({a:4},{a:{b:4}})     --->   true
 		//	haveSameKeys({a:4},{a:1,b:5})     --->   false
 		//	haveSameKeys({b:8,a:4},{a:1,b:5}) --->   true
-		//	haveSameKeys(3,"")                --->   true   //Because both have Object.keys(3)====Object.keys("")====[]
+		//	haveSameKeys(3,"")                -*->   true   //Because both have Object.keys(3)====Object.keys("")====[]
 		//	haveSameKeys(3,{})                --->   true
 		//	haveSameKeys(3,{a:5})             --->   false
 		//	haveSameKeys(null,{a:5})          --->   false
-		//	haveSameKeys(null,4)              --->   true   //Object.keys(null) throws an error, but this function treats null and undefined as having no keys, and pretends Object.keys(null)====Object.keys(undefined)====[]
+		//	haveSameKeys(null,4)              -*->   true   //Object.keys(null) throws an error, but this function treats null and undefined as having no keys, and pretends Object.keys(null)====Object.keys(undefined)====[]
 		//	haveSameKeys(null,{})             --->   true
 		//	haveSameKeys(undefined,{})        --->   true
 		//	haveSameKeys(undefined,null)      --->   true
