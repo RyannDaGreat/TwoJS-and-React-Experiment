@@ -149,21 +149,15 @@ function PropsLegato({alphaRate,targetProps,Component,children})
 	const deltaTime=currentTime-prevTime
 	const alpha=1-Math.pow(1-alphaRate,deltaTime)// https://www.desmos.com/calculator/wxlvrbsvjw
 	const currentProps=r.objectBlend(prevProps,targetProps,alpha)
-	console.log(prevProps,targetProps,currentProps,alpha)
+	// console.log(currentProps)
 	React.useEffect(()=>{
-		const converged=r.equalsShallow(prevProps,currentProps)//If this is true, stop animating to save CPU (blending will have no effect anymore)
-		if(!converged)
+		// const converged=r.equalsShallow(prevProps,currentProps)//If this is true, stop animating to save CPU (blending will have no effect anymore)
+		// if(!converged)
 		{
 			//The !converged check is necessary, otherwise this will loop infinitely (because we're setting the state, which will cause PropsLegato to render again and set the state again etc)
 			setPrevProps(currentProps)
 			setPrevTime (currentTime )
-			console.log(alpha)
 		}
-		else
-		{
-			console.log('CONVERGED')
-		}
-
 	})
 	return <Component {...currentProps}>
 		{children}
