@@ -739,6 +739,7 @@ const r={
 	},
 	objectBlend(a,b,alpha,{blend=r.valueBlend}={})
 	{
+		//TODO should somehow be lumped with equalsShallow
 		//Kind of like deltas.blended, except it's shallow. It isn't recursive.
 		//This is a pure function.
 		// r.objectBlend({a:5,b:6,c:8}    ,{t:5,c:7      },.9)    --->    {t: 5, c: 7.1    , a: 5, b: 6  }

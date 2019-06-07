@@ -131,28 +131,58 @@ function PropsBlend({alpha,props,target,Component,children})
 	let objectBlend=r.objectBlend(props, target, alpha)
 	window._props=props
 	window._target=target
-	console.log(props,target,alpha,objectBlend)
+	// console.log(props,target,alpha,objectBlend)
 	return <Component {...objectBlend}>
 		{children}
 	</Component>
 }
 
-function PropsLegato({alphaPerSecond,props,keys,Component,children})
+function PropsLegato({alphaRate,targetProps,Component,children})
 {
-	//Exponential smoothing on all props whose name is in 'keys'
+	//Exponential smoothing on all targetProps whose name is in 'keys'
+	//Will only tween numerical properties
+	console.assert(r.isNumber(alphaRate)&&alphaRate>=0&&alphaRate<=1,'Bad alphaRate value:',alphaRate)
+	const [prevTime ,setPrevTime ]=React.useState(r.gtoc())
+	const [prevProps,setPrevProps]=React.useState({})
+	const currentTime=r.gtoc()//Time is measured in seconds
+	console.assert(prevTime<=currentTime)
+	const deltaTime=currentTime-prevTime
+	const alpha=1-Math.pow(1-alphaRate,deltaTime)// https://www.desmos.com/calculator/wxlvrbsvjw
+	const currentProps=r.objectBlend(prevProps,targetProps,alpha)
+	console.log(prevProps,targetProps,currentProps,alpha)
+	React.useEffect(()=>{
+		const converged=r.equalsShallow(prevProps,currentProps)//If this is true, stop animating to save CPU (blending will have no effect anymore)
+		if(!converged)
+		{
+			//The !converged check is necessary, otherwise this will loop infinitely (because we're setting the state, which will cause PropsLegato to render again and set the state again etc)
+			setPrevProps(currentProps)
+			setPrevTime (currentTime )
+			console.log(alpha)
+		}
+		else
+		{
+			console.log('CONVERGED')
+		}
 
+	})
+	return <Component {...currentProps}>
+		{children}
+	</Component>
 }
 
 function App()
 {
 	const [w,sw]=React.useState(0)
 	return <>
+		<PropsLegato Component={GeneralizedTwo} targetProps={{onClick: ()=>sw(.5),width:w*5}} alphaRate={.8}>
+
+		</PropsLegato>
 		<GeneralizedTwo width={w}
 		                onMouseMove={()=>sw(w+.1)} />
 		<PropsBlend Component={GeneralizedTwo}
 		            alpha    ={w}
 		            target   ={{width: 10}}
-		            props    ={{width: 0, onMouseMove: ()=>sw(w+.1)}}/>
+		            props    ={{width: 0, onMouseMove: ()=>sw(w+.1),onClick: ()=>sw(.5)}}/>
 	</>
 }
 
