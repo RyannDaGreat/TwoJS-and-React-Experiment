@@ -124,7 +124,7 @@ const r={
 		//Originally written to normalize djson files' object representations
 		//EXAMPLE: sortKeys({3:0,2:0,1:0}) ==== {1:0,2:0,3:0}   (order isn't supposed to matter, but it seems that it IS generally preserved)
 		//TODO assert.rightArgumentLength(arguments)
-		if(r.is_object(object))
+		if(r.isPureObject(object))
 		{
 			const keys=Object.keys(object)
 			keys.sort()
@@ -137,43 +137,43 @@ const r={
 			}
 		}
 	},
-	bad_sleep(seconds)
+	badSleep(seconds)
 	{
 		console.assert(arguments.length===1,'Wrong number of arguments.')
 		//Burn CPU for seconds
 		const e=new Date().getTime()+(seconds*1000)
 		while(new Date().getTime() <= e){}
 	},
-	random_chance(probability)
+	randomChance(probability)
 	{
 		console.assert(arguments.length===1,'Wrong number of arguments.')
 		return Math.random()<probability
 	},
-	all_chars_are_unique(string)
+	allCharsAreUnique(string)
 	{
 		console.assert(arguments.length===1,'Wrong number of arguments.')
-		return string.length===r.number_of_unique_chars(string)
+		return string.length===r.numberOfUniqueChars(string)
 	},
-	number_of_unique_chars(string)
+	numberOfUniqueChars(string)
 	{
 		console.assert(arguments.length===1,'Wrong number of arguments.')
 		// noinspection JSValidateTypes
 		return new Set(string.split('')).size
 	},
-	random_integer(max)
+	randomInteger(max)
 	{
 		console.assert(arguments.length===1,'Wrong number of arguments.')
 		return Math.floor(Math.random()*(max+1))
 	},
-	random_index(list)
+	randomIndex(list)
 	{
 		console.assert(arguments.length===1,'Wrong number of arguments.')
-		return r.random_integer(list.length-1)
+		return r.randomInteger(list.length-1)
 	},
-	random_element(list)
+	randomElement(list)
 	{
 		console.assert(arguments.length===1,'Wrong number of arguments.')
-		return list[r.random_index(list)]
+		return list[r.randomIndex(list)]
 	},
 	charInString(char,string)
 	{
@@ -224,34 +224,34 @@ const r={
 		delete out[key]
 		return out
 	},
-	split_on_first_space(string)
+	splitOnFirstSpace(string)
 	{
 		console.assert(arguments.length===1,'Wrong number of arguments.')
 		// noinspection JSValidateTypes
 		return string.split(/ (.*)/,2)
 	},
-	split_lines(string)
+	splitLines(string)
 	{
 		// noinspection JSValidateTypes
 		return string.split('\n')
 	},
-	remove_empty_lines(string)
+	removeEmptyLines(string)
 	{
 		console.assert(arguments.length===1,'Wrong number of arguments.')
-		return r.split_lines(string).filter(x=>x.trim()).join('\n')
+		return r.splitLines(string).filter(x=>x.trim()).join('\n')
 	},
-	nested_path(path,value)
+	nestedPath(path, value)
 	{
 		console.assert(arguments.length===2,'Wrong number of arguments.')
-		//EXAMPLE: nested_path([4,3,2,1],0) ==== {4:{3:{2:{1:0}}}}
-		//EXAMPLE: nested_path([],)
+		//EXAMPLE: nestedPath([4,3,2,1],0) ==== {4:{3:{2:{1:0}}}}
+		//EXAMPLE: nestedPath([],)
 		console.assert(path&&Object.getPrototypeOf(path)===Array.prototype,'Path must be a list of keys')
 		let out=value
 		for(const key of [...path].reverse())
 			out={[key]:out}
 		return out
 	},
-	multiply_string(string,number)
+	multiplyString(string, number)
 	{
 		console.assert(arguments.length===2,'Wrong number of arguments.')
 		//Like python ("abc"*3=="abcabcabc")
@@ -260,54 +260,54 @@ const r={
 			out+=string
 		return out
 	},
-	is_defined(x)
+	isDefined(x)
 	{
 		console.assert(arguments.length===1,'Wrong number of arguments.')
 		return x!==undefined
 	},
-	is_prototype_of(x,type)
+	isPurePrototypeOf(x, type)
 	{
 		//This is like type-checking with 'typeof', or 'instanceof', except that this way of checking is much more precise.
 		console.assert(arguments.length===2,'Wrong number of arguments.')
 		//TODO assert.defined(type)
 		return Boolean(x&&Object.getPrototypeOf(x)===type.prototype)
 	},
-	is_object(x)
+	isPureObject(x)
 	{
 		//Returns true IFF x is a pure object, meaning it could have been created with an object literal (no funky prototype chains)
-		//For example, r.is_object(any delta) is always true (because all deltas should be able to exist from object literals)
+		//For example, r.isPureObject(any delta) is always true (because all deltas should be able to exist from object literals)
 		console.assert(arguments.length===1,'Wrong number of arguments.')
-		return r.is_prototype_of(x,Object)
+		return r.isPurePrototypeOf(x, Object)
 	},
-	is_function(x)
+	isPureFunction(x)
 	{
 		console.assert(arguments.length===1,'Wrong number of arguments.')
-		return r.is_prototype_of(x,Function)
+		return r.isPurePrototypeOf(x, Function)
 	},
-	is_symbol(x)
+	isPureSymbol(x)
 	{
 		console.assert(arguments.length===1,'Wrong number of arguments.')
-		return r.is_prototype_of(x,Symbol)
+		return r.isPurePrototypeOf(x, Symbol)
 	},
-	is_array(x)
+	isPureArray(x)
 	{
 		console.assert(arguments.length===1,'Wrong number of arguments.')
-		return r.is_prototype_of(x,Array)
+		return r.isPurePrototypeOf(x, Array)
 	},
-	is_string(x)
+	isPureString(x)
 	{
 		console.assert(arguments.length===1,'Wrong number of arguments.')
-		return r.is_prototype_of(x,String)
+		return r.isPurePrototypeOf(x, String)
 	},
-	is_number(x)
+	isPureNumber(x)
 	{
 		console.assert(arguments.length===1,'Wrong number of arguments.')
-		return r.is_prototype_of(x,Number)
+		return r.isPurePrototypeOf(x, Number)
 	},
 	are_objects(...variables)
 	{
 		for(const variable of variables)
-			if(!r.is_object(variable))
+			if(!r.isPureObject(variable))
 				return false
 		return true
 	},
@@ -340,7 +340,7 @@ const r={
 			return singleton
 		}
 	},
-	get_indent_level(line,key={'\t':4})
+	getIndentLevel(line, key={'\t':4})
 	{
 		console.assert(arguments.length>=1,'Wrong number of arguments.')
 		//TODO assert.isString(line)
@@ -563,7 +563,7 @@ const r={
 		//TODO assert.isFunction(leafTransform)
 		//TODO assert.isPureObject(objectTree)
 		for(const [index,value] of Object.entries(objectTree))
-			if(r.is_object(value))
+			if(r.isPureObject(value))
 				r.transformObjectTreeLeaves(value,leafTransform)
 			else
 				objectTree[index]=leafTransform(value)
@@ -585,7 +585,7 @@ const r={
 		{
 			for(const [index,value] of Object.entries(objectTree))
 			{
-				if(!r.is_object(value))
+				if(!r.isPureObject(value))
 				{
 					const newPath=[index]
 					if(includeLeaves)
@@ -640,11 +640,11 @@ const r={
 		//r.sameObjectTreeStructure({},5) is false
 		//r.sameObjectTreeStructure(6,5) is true
 		console.assert(arguments.length===2,'Wrong number of arguments.')
-		if(r.is_object(a)!==r.is_object(b))
+		if(r.isPureObject(a)!==r.isPureObject(b))
 		{
 			return false
 		}
-		const are_objects=r.is_object(a)
+		const are_objects=r.isPureObject(a)
 		if(!are_objects)
 			return true
 		for(const key of Object.keys(a))
@@ -722,7 +722,7 @@ const r={
 		// r.valueBlend(3  ,1  ,1 )	--->	1
 		// r.valueBlend(3  ,1  ,.5)	--->	2
 		// r.valueBlend(3  ,'A',.5)	--->	"A"
-		if(r.is_number(a)&&r.is_number(b))
+		if(r.isPureNumber(a)&&r.isPureNumber(b))
 			return blend(a,b,alpha)
 		return alpha<threshold?a:b
 	},

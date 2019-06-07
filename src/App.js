@@ -115,13 +115,18 @@ function GeneralizedTwo(props)
 	</div>
 }
 
+
 function PropsBlend({alpha,props,target,Component,children})
 {
 	//<PropBlend alpha    ={.5}
 	//           props    ={}
 	//           target   ={{prop1:4,prop5:7}}
 	//           component={Div}/>
-	return <Component {...r.objectBlend(props,target,alpha)}>
+	let objectBlend=r.objectBlend(props, target, alpha)
+	window._props=props
+	window._target=target
+	console.log(props,target,alpha,objectBlend)
+	return <Component {...objectBlend}>
 		{children}
 	</Component>
 }
@@ -137,7 +142,12 @@ function App()
 {
 	const [w,sw]=React.useState(0)
 	return <>
-		<GeneralizedTwo width={w} onMouseMove={()=>sw(w+.1)}/>
+		<GeneralizedTwo width={w}
+						onMouseMove={()=>sw(w+.1)} />
+		<PropsBlend Component={GeneralizedTwo}
+					alpha    ={w}
+					target   ={{width: 10}}
+					props    ={{width: 0, onMouseMove: ()=>sw(w+.1)}}/>
 	</>
 }
 
